@@ -1,0 +1,10 @@
+certifi==2024.8.30
+clickhouse-connect==0.8.9
+clickhouse-driver==0.2.9
+lz4==4.3.3
+py4j==0.10.9.7
+pyspark==3.5.3
+pytz==2024.2
+tzlocal==5.2
+urllib3==2.2.3
+zstandard==0.23.0
