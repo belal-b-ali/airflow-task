@@ -54,7 +54,6 @@ def _invoice_transformation(df):
 def read_json_file(**kwargs):
     df = Config.spark.read.option("multiline", True).json('/opt/airflow/invoices_logs.json')
 
-    df.printSchema()
     json_data = [row.asDict() for row in df.collect()]
 
     kwargs['ti'].xcom_push(key='json_data', value=json_data)
@@ -129,13 +128,7 @@ def data_transformation(**kwargs):
         ("time_dim", time_dim),
         ("invoice_dim", invoice_dim)
     ]:
-        if name == "payments_fact":
-            x = [tuple(row) for row in table.collect()]
-            print(">>>>>>>>>>")
-            for i in x:
-                if i[8] is None:
-                    print(i)
-            print(">>>>>>>>>>")
+
         ti.xcom_push(key=name, value=[tuple(row) for row in table.collect()])
 
     kwargs['ti'].xcom_push(key='transformed_data', value=json_data)
@@ -148,9 +141,9 @@ def load_data_to_clickhouse(table_name, **kwargs):
         Config.clickhouse_client.insert(table_name, data, column_names=Config.column_map[table_name])
 
 with DAG(
-    'json_read_transform_and_print',
+    'json_read_transform_and_load',
     default_args=Config.default_args,
-    description='A DAG to read, transform, and print JSON data',
+    description='A DAG to read, transform, and load JSON data',
     schedule_interval=None,
     start_date=datetime(2023, 1, 1),
     catchup=False,
